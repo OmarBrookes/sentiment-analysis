@@ -77,7 +77,7 @@ if st.button("Analyse Sentiment"):
         # Use the colour corresponding to the first predicted label
         sentiment_colour = COLOURS[sentiment[0]]
         st.markdown(
-            f'<div style="background-colour:{sentiment_colour};padding:10px;border-radius:5px;color:black;font-weight:bold;margin-bottom:15px;">Sentiment: {sentiment_with_emojis}</div>',
+            f'<div style="background-color:{sentiment_colour};padding:10px;border-radius:5px;color:black;font-weight:bold;margin-bottom:15px;">Sentiment: {sentiment_with_emojis}</div>',
             unsafe_allow_html=True
         )
     
@@ -96,6 +96,6 @@ if st.button("Analyse Sentiment"):
                     unsafe_allow_html=True
                 )
                 st.markdown(
-                    f'<div style="background-colour:{sentiment_colour};padding:10px;border-radius:5px;color:black;font-weight:bold;margin-bottom:15px;">Sentiment: {sentiment_with_emojis}</div>',
+                    f'<div style="background-color:{sentiment_colour};padding:10px;border-radius:5px;color:black;font-weight:bold;margin-bottom:15px;">Sentiment: {sentiment_with_emojis}</div>',
                     unsafe_allow_html=True
                 )
