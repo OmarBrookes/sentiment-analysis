@@ -22,7 +22,7 @@ EMOJIS = {
     'ironic': '😏'
 }
 COLOURS = {
-    'neutral': '#D3D3D3',   # Light gray
+    'neutral': '#D3D3D3',   # Light grey
     'positive': '#90EE90',   # Light green
     'mixed': '#FFD700',      # Gold
     'sarcastic': '#87CEEB',  # Sky blue
