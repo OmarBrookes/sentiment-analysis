@@ -1,5 +1,6 @@
 import streamlit as st
 import torch
+import transformers
 from transformers import RobertaTokenizer, RobertaForSequenceClassification
 
 # -=-=-=- Setup: Load model, tokenizer and set device -=-=-=-
