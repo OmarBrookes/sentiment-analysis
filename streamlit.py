@@ -4,7 +4,7 @@ import transformers
 from transformers import RobertaTokenizer, RobertaForSequenceClassification
 
 # -=-=-=- Setup: Load model, tokenizer and set device -=-=-=-
-MODEL_PATH = "OmarBrookes/my-sentiment-analysis"  # The model’s Hugging Face path 
+MODEL_PATH = "OmarBrookes/sentiment-analysis"  # The model’s Hugging Face path 
 tokenizer = RobertaTokenizer.from_pretrained(MODEL_PATH)
 model = RobertaForSequenceClassification.from_pretrained(MODEL_PATH)
 
