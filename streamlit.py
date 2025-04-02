@@ -73,9 +73,10 @@ if st.button("Analyse Sentiment"):
     # If the user has entered text manually, process that first
     if user_input:
         review_count += 1
+        user_input_single_line = " ".join(user_input.splitlines())  # Convert multiple lines to a single line
         st.subheader(f"Review #{review_count}")
-        st.markdown(f'<div style="padding:10px;margin-bottom:5px;font-weight:bold;">📝 Review Entered: "{user_input}"</div>', unsafe_allow_html=True)
-        sentiment = analyse_sentiment(user_input)
+        st.markdown(f'<div style="padding:10px;margin-bottom:5px;font-weight:bold;">📝 Review Entered: "{user_input_single_line}"</div>', unsafe_allow_html=True)
+        sentiment = analyse_sentiment(user_input_single_line)
         sentiment_with_emojis = ', '.join([f"{EMOJIS[label]} {label}" for label in sentiment])
         # Set the background colour based on the first predicted label
         sentiment_colour = COLOURS[sentiment[0]]
