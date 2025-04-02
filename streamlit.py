@@ -2,8 +2,8 @@ import streamlit as st
 import torch
 from transformers import RobertaTokenizer, RobertaForSequenceClassification
 
-# ----- Setup: Load model, tokenizer and set device -----
-MODEL_PATH = "OmarBrookes/my-sentiment-analysis"  # The model’s Hugging Face path
+# -=-=-=- Setup: Load model, tokenizer and set device -=-=-=-
+MODEL_PATH = "OmarBrookes/omar-sentiment-analysis"  # The model’s Hugging Face path
 tokenizer = RobertaTokenizer.from_pretrained(MODEL_PATH)
 model = RobertaForSequenceClassification.from_pretrained(MODEL_PATH)
 
@@ -30,7 +30,7 @@ COLOURS = {
     'ironic': '#D8BFD8'      # Thistle
 }
 
-# ----- Custom Thresholds -----
+# -=-=-=- Custom Thresholds -=-=-=-
 # These thresholds have been adjusted to fine-tune label detection
 custom_thresholds = {
     'neutral': 0.39,
@@ -41,17 +41,17 @@ custom_thresholds = {
     'ironic': 0.16
 }
 
-# ----- Streamlit App Interface -----
-st.title("Sentiment Analysis")
-st.write("Enter a text or upload a file to get sentiment predictions using custom thresholds.")
+# -=-=-=- Streamlit App Interface -=-=-=-
+st.title("💬 Sentiment Analysis")
+st.write("Enter text or upload a file to get sentiment predictions.")
 
-user_input = st.text_area("Enter your text here:")
+user_input = st.text_area("Enter text here:")
 uploaded_file = st.file_uploader("Or upload a .txt file", type=["txt"])
 review_count = 0 # To keep track of the review numbers
 
-# ----- Prediction Function Using Custom Thresholds -----
+# -=-=-=- Prediction Function Using Custom Thresholds -=-=-=-
 def analyse_sentiment(text):
-    # Tokenise the input text, with truncation and padding up to 128 tokens
+    # Tokenize the input text, with truncation and padding up to 128 tokens
     inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=128)
     inputs = {k: v.to(device) for k, v in inputs.items()}  # Move inputs to the correct device
     
@@ -67,7 +67,7 @@ def analyse_sentiment(text):
     # If no label meets the threshold, return 'neutral' by default
     return predicted_labels if predicted_labels else ["neutral"]
 
-# ----- Interactive Prediction -----
+# -=-=-=- Interactive Prediction -=-=-=-
 if st.button("Analyse Sentiment"):
     # If the user has entered text manually, process that first
     if user_input:
