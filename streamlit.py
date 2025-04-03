@@ -4,7 +4,7 @@ import transformers
 import random
 from transformers import RobertaTokenizer, RobertaForSequenceClassification
 
-# -=-=-=- Setup: Load model, tokenizer and set device -=-=-=- #
+# -=-=-=- Setup: Load model, tokenizer and set device -=-=-=-
 MODEL_PATH = "OmarBrookes/sentiment-analysis"
 tokenizer = RobertaTokenizer.from_pretrained(MODEL_PATH)
 model = RobertaForSequenceClassification.from_pretrained(MODEL_PATH)
@@ -25,12 +25,12 @@ EMOJIS = {
 }
 
 COLOURS = {
-    'neutral': '#D3D3D3',   # Light grey
-    'positive': '#90EE90',   # Light green
-    'mixed': '#FFD700',      # Gold
-    'sarcastic': '#87CEEB',  # Sky blue
-    'negative': '#FFB6C1',   # Light pink
-    'ironic': '#D8BFD8'      # Purple (Thistle)
+    'neutral': '#D3D3D3',
+    'positive': '#90EE90',
+    'mixed': '#FFD700',
+    'sarcastic': '#87CEEB',
+    'negative': '#FFB6C1',
+    'ironic': '#D8BFD8'
 }
 
 REVIEW_MESSAGES = {
@@ -70,14 +70,13 @@ SAMPLE_REVIEWS = [
     "Wow, just wow. Not in a good way though."
 ]
 
-# -=-=-=- Streamlit UI Setup -=-=-=- #
+# -=-=-=- Streamlit UI Setup -=-=-=-
 st.title("💬 Sentiment Analysis")
 st.write("Enter text or upload a file to get sentiment predictions.")
 
 # Session state tracking
 if "user_input" not in st.session_state:
     st.session_state.user_input = ""
-
 review_count = 0
 analyse_clicked = False
 
@@ -85,7 +84,7 @@ analyse_clicked = False
 user_input = st.text_area("Enter text here:", value=st.session_state.user_input, key="input_text")
 
 # File upload
-uploaded_file = st.file_uploader("Or upload a .txt file", type=["txt"], key="file_uploader")
+uploaded_file = st.file_uploader("Or upload a .txt file", type=["txt"])
 
 # Buttons layout
 st.markdown("###")
@@ -97,16 +96,14 @@ with col1:
 
 with col2:
     if st.button("🗑️ Clear"):
-        # Clear all relevant keys and rerun
-        for key in ["input_text", "file_uploader", "user_input"]:
-            if key in st.session_state:
-                del st.session_state[key]
+        st.session_state.user_input = ""
         st.rerun()
 
 with col3:
     if st.button("🎲 Try Sample Review"):
         random_sample = random.choice(SAMPLE_REVIEWS)
         st.session_state.user_input = random_sample
+        st.toast("✅ Sample inserted!")
         analyse_clicked = True
 
 # Prediction function
@@ -126,6 +123,7 @@ def analyse_sentiment(text):
         predicted_labels = [label for label in predicted_labels if label not in ["positive", "negative"]]
         predicted_labels.append("mixed")
 
+    # If mixed is present, remove positive and negative
     if "mixed" in predicted_labels:
         predicted_labels = [label for label in predicted_labels if label not in ["positive", "negative"]]
 
