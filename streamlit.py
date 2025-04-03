@@ -1,3 +1,6 @@
+import os
+os.environ["STREAMLIT_DISABLE_FILE_WATCHER"] = "true"
+
 import streamlit as st
 import torch
 import transformers
