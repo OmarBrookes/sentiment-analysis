@@ -4,7 +4,7 @@ import transformers
 import random
 from transformers import RobertaTokenizer, RobertaForSequenceClassification
 
-# -=-=-=- Setup: Load model, tokenizer and set device -=-=-=-
+# -=-=-=- Setup: Load model, tokenizer and set device -=-=-=- #
 MODEL_PATH = "OmarBrookes/sentiment-analysis"
 tokenizer = RobertaTokenizer.from_pretrained(MODEL_PATH)
 model = RobertaForSequenceClassification.from_pretrained(MODEL_PATH)
@@ -70,7 +70,7 @@ SAMPLE_REVIEWS = [
     "Wow, just wow. Not in a good way though."
 ]
 
-# -=-=-=- Streamlit UI Setup -=-=-=-
+# -=-=-=- Streamlit UI Setup -=-=-=- #
 st.title("💬 Sentiment Analysis")
 st.write("Enter text or upload a file to get sentiment predictions.")
 
@@ -97,17 +97,11 @@ with col1:
 
 with col2:
     if st.button("🗑️ Clear"):
-        # Clear custom session state
-        st.session_state.user_input = ""
-
-        # Remove widget keys (must match your keys!)
-        for key in ["input_text", "file_uploader"]:
+        # Clear all relevant keys and rerun
+        for key in ["input_text", "file_uploader", "user_input"]:
             if key in st.session_state:
                 del st.session_state[key]
-
-        # Fully refresh UI
         st.rerun()
-
 
 with col3:
     if st.button("🎲 Try Sample Review"):
@@ -132,7 +126,6 @@ def analyse_sentiment(text):
         predicted_labels = [label for label in predicted_labels if label not in ["positive", "negative"]]
         predicted_labels.append("mixed")
 
-    # If mixed is present, remove positive and negative
     if "mixed" in predicted_labels:
         predicted_labels = [label for label in predicted_labels if label not in ["positive", "negative"]]
 
