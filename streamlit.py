@@ -74,7 +74,7 @@ with col1:
 with col2:
     if st.button("Clear"):
         st.session_state.user_input = ""
-        st.experimental_rerun()
+        st.rerun()
 
 review_count = 0  # Local counter
 
