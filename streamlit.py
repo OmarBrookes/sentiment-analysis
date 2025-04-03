@@ -76,14 +76,12 @@ if "user_input" not in st.session_state:
     st.session_state.user_input = ""
 if "input_text" not in st.session_state:
     st.session_state.input_text = ""
-if "file_uploader" not in st.session_state:
-    st.session_state.file_uploader = None
 
 # Text input
 user_input = st.text_area("Enter text here:", key="input_text")
 
-# File upload
-uploaded_file = st.file_uploader("Or upload a .txt file", type=["txt"], key="file_uploader")
+# File upload (don't use key in session_state!)
+uploaded_file = st.file_uploader("Or upload a .txt file", type=["txt"])
 
 # Button layout
 st.markdown("###")
@@ -97,10 +95,9 @@ with col1:
 
 with col2:
     if st.button("🗑️ Clear"):
-        # Properly reset all session keys
-        for key in ["input_text", "file_uploader", "user_input"]:
-            if key in st.session_state:
-                del st.session_state[key]
+        # Properly reset session state (excluding file_uploader)
+        st.session_state.input_text = ""
+        st.session_state.user_input = ""
         st.rerun()
 
 with col3:
