@@ -102,7 +102,7 @@ with col2:
             del st.session_state["input_text"]
         if "file_uploader" in st.session_state:
             del st.session_state["file_uploader"]
-        st.experimental_rerun()
+        st.rerun()
 
 with col3:
     if st.button("🎲 Try Sample Review"):
