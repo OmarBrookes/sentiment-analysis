@@ -97,12 +97,17 @@ with col1:
 
 with col2:
     if st.button("🗑️ Clear"):
+        # Clear custom session state
         st.session_state.user_input = ""
-        if "input_text" in st.session_state:
-            del st.session_state["input_text"]
-        if "file_uploader" in st.session_state:
-            del st.session_state["file_uploader"]
+
+        # Remove widget keys (must match your keys!)
+        for key in ["input_text", "file_uploader"]:
+            if key in st.session_state:
+                del st.session_state[key]
+
+        # Fully refresh UI
         st.rerun()
+
 
 with col3:
     if st.button("🎲 Try Sample Review"):
