@@ -117,6 +117,12 @@ def analyse_sentiment(text):
         probs = torch.sigmoid(outputs.logits)[0].cpu().numpy()
 
     predicted_labels = [label for label, prob in zip(LABELS, probs) if prob >= custom_thresholds[label]]
+
+    # If both positive and negative detected, but mixed isn't, treat it as mixed
+    if "positive" in predicted_labels and "negative" in predicted_labels and "mixed" not in predicted_labels:
+        predicted_labels = [label for label in predicted_labels if label not in ["positive", "negative"]]
+        predicted_labels.append("mixed")
+
     return predicted_labels if predicted_labels else ["neutral"]
 
 # Handle analysis
