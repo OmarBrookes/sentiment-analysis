@@ -75,20 +75,14 @@ SAMPLE_REVIEWS = [
     "It’s fine. Not good, not bad. Just fine.",
     "The product is great, but the customer service was awful.",
     "Yeah, this is exactly what I needed... not.",
-    "Works as expected. Nothing to complain about.",
     "Fantastic quality and super fast shipping!",
     "Do not waste your money on this junk.",
-    "I’m not sure whether to laugh or cry after using this.",
     "It does what it says, but I wouldn’t buy it again.",
     "Oh great, another feature that doesn’t actually work.",
     "Pretty average overall, nothing stood out.",
-    "I got exactly what I ordered. Happy with it.",
     "If disappointment had a face, it would be this product.",
-    "Sure, it works... eventually, after a dozen restarts.",
-    "The packaging was nice. That's the best part I can say.",
-    "Honestly, I expected worse — pleasantly surprised.",
+    "Honestly, I expected worse. Pleasantly surprised.",
     "Good build, but the software is a nightmare.",
-    "This is so amazing, I might cry. In a good way!",
     "Wow, just wow. Not in a good way though."
 ]
 
