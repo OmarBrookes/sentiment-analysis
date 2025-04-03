@@ -67,13 +67,17 @@ user_input = st.text_area("Enter text here:", value=st.session_state.user_input,
 # File upload
 uploaded_file = st.file_uploader("Or upload a .txt file", type=["txt"])
 
-# Buttons (Analyse and Clear)
-col1, col2 = st.columns([1, 1])
+# Buttons (Analyse, Clear, Sample)
+col1, col2, col3 = st.columns([1, 1, 1])
 with col1:
     analyse_clicked = st.button("Analyse Sentiment")
 with col2:
     if st.button("Clear"):
         st.session_state.user_input = ""
+        st.rerun()
+with col3:
+    if st.button("Try Sample Review"):
+        st.session_state.user_input = "I love the product, but the delivery was a disaster."
         st.rerun()
 
 review_count = 0  # Local counter
