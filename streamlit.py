@@ -14,6 +14,7 @@ model.to(device)
 
 # Define label names, corresponding emojis, and background colours
 LABELS = ['neutral', 'positive', 'mixed', 'sarcastic', 'negative', 'ironic']
+
 EMOJIS = {
     'neutral': '😐',
     'positive': '😊',
@@ -22,13 +23,23 @@ EMOJIS = {
     'negative': '😞',
     'ironic': '😏'
 }
+
 COLOURS = {
     'neutral': '#D3D3D3',   # Light grey
     'positive': '#90EE90',   # Light green
     'mixed': '#FFD700',      # Gold
     'sarcastic': '#87CEEB',  # Sky blue
     'negative': '#FFB6C1',   # Light pink
-    'ironic': '#D8BFD8'      # Thistle
+    'ironic': '#D8BFD8'      # Purple (Thistle)
+}
+
+REVIEW_MESSAGES = {
+    "positive": "✔️ This review is positive and expresses satisfaction.",
+    "negative": "❌ This review is negative and shows dissatisfaction.",
+    "neutral": "➖ This review is neutral and doesn’t show strong emotions.",
+    "mixed": "🔀 This review contains both positive and negative feelings.",
+    "sarcastic": "🙃 This review sounds sarcastic — it might mean the opposite of what it says.",
+    "ironic": "😏 This review has an ironic tone — likely saying one thing but implying another."
 }
 
 # -=-=-=- Custom Thresholds -=-=-=-
@@ -70,22 +81,28 @@ def analyse_sentiment(text):
 
 # -=-=-=- Interactive Prediction -=-=-=-
 if st.button("Analyse Sentiment"):
-    # If the user has entered text manually, process that first
     if user_input:
         review_count += 1
-        user_input_single_line = " ".join(user_input.splitlines())  # Convert multiple lines to a single line
+        user_input_single_line = " ".join(user_input.splitlines())
         st.subheader(f"Review #{review_count}")
-        st.markdown(f'<div style="padding:10px;margin-bottom:5px;font-weight:bold;">📝 Review Entered: "{user_input_single_line}"</div>', unsafe_allow_html=True)
+        st.markdown(
+            f'<div style="padding:10px;margin-bottom:5px;font-weight:bold;">📝 Review Entered: "{user_input_single_line}"</div>',
+            unsafe_allow_html=True
+        )
+        
         sentiment = analyse_sentiment(user_input_single_line)
         sentiment_with_emojis = ', '.join([f"{EMOJIS[label]} {label}" for label in sentiment])
-        # Set the background colour based on the first predicted label
         sentiment_colour = COLOURS[sentiment[0]]
+        
         st.markdown(
             f'<div style="background-color:{sentiment_colour};padding:10px;border-radius:5px;color:black;font-weight:bold;margin-bottom:15px;">Sentiment: {sentiment_with_emojis}</div>',
             unsafe_allow_html=True
         )
-    
-    # If the user uploads a text file, process each non-empty line as a review
+        
+        # Display review interpretation
+        for label in sentiment:
+            st.markdown(f"<div style='margin-bottom:10px;'>{REVIEW_MESSAGES[label]}</div>", unsafe_allow_html=True)
+
     if uploaded_file:
         sentences = uploaded_file.read().decode("utf-8").splitlines()
         st.subheader(f"Processing {len(sentences)} reviews from file...")
@@ -95,11 +112,15 @@ if st.button("Analyse Sentiment"):
                 sentiment = analyse_sentiment(sentence)
                 sentiment_with_emojis = ', '.join([f"{EMOJIS[label]} {label}" for label in sentiment])
                 sentiment_colour = COLOURS[sentiment[0]]
+                
                 st.markdown(
                     f'<div style="padding:10px;margin-bottom:5px;font-weight:bold;">📝 Review #{review_count}: "{sentence}"</div>',
                     unsafe_allow_html=True
                 )
                 st.markdown(
-                    f'<div style="background-color:{sentiment_colour};padding:10px;border-radius:5px;color:black;font-weight:bold;margin-bottom:15px;">Sentiment: {sentiment_with_emojis}</div>',
+                    f'<div style="background-color:{sentiment_colour};padding:10px;border-radius:5px;color:black;font-weight:bold;margin-bottom:10px;">Sentiment: {sentiment_with_emojis}</div>',
                     unsafe_allow_html=True
                 )
+                # Display review interpretation
+                for label in sentiment:
+                    st.markdown(f"<div style='margin-bottom:10px;'>{REVIEW_MESSAGES[label]}</div>", unsafe_allow_html=True)
