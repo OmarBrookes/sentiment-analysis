@@ -68,6 +68,35 @@ user_input = st.text_area("Enter text here:", value=st.session_state.user_input,
 uploaded_file = st.file_uploader("Or upload a .txt file", type=["txt"])
 
 # Buttons (Analyse, Clear, Sample)
+# Sample reviews to rotate through
+SAMPLE_REVIEWS = [
+    "I absolutely love this! Everything works perfectly.",
+    "This is the worst product I’ve ever bought.",
+    "It’s fine. Not good, not bad. Just fine.",
+    "The product is great, but the customer service was awful.",
+    "Yeah, this is exactly what I needed... not.",
+    "Works as expected. Nothing to complain about.",
+    "Fantastic quality and super fast shipping!",
+    "Do not waste your money on this junk.",
+    "I’m not sure whether to laugh or cry after using this.",
+    "It does what it says, but I wouldn’t buy it again.",
+    "Oh great, another feature that doesn’t actually work.",
+    "Pretty average overall, nothing stood out.",
+    "I got exactly what I ordered. Happy with it.",
+    "If disappointment had a face, it would be this product.",
+    "Sure, it works... eventually, after a dozen restarts.",
+    "The packaging was nice. That's the best part I can say.",
+    "Honestly, I expected worse — pleasantly surprised.",
+    "Good build, but the software is a nightmare.",
+    "This is so amazing, I might cry. In a good way!",
+    "Wow, just wow. Not in a good way though."
+]
+
+# Set up session state for cycling through samples
+if "sample_index" not in st.session_state:
+    st.session_state.sample_index = 0
+
+# Buttons (Analyse, Clear, Try Sample Review)
 col1, col2, col3 = st.columns([1, 1, 1])
 with col1:
     analyse_clicked = st.button("Analyse Sentiment")
@@ -77,7 +106,8 @@ with col2:
         st.rerun()
 with col3:
     if st.button("Try Sample Review"):
-        st.session_state.user_input = "I love the product, but the delivery was a disaster."
+        st.session_state.user_input = SAMPLE_REVIEWS[st.session_state.sample_index]
+        st.session_state.sample_index = (st.session_state.sample_index + 1) % len(SAMPLE_REVIEWS)
         st.rerun()
 
 review_count = 0  # Local counter
