@@ -118,10 +118,14 @@ def analyse_sentiment(text):
 
     predicted_labels = [label for label, prob in zip(LABELS, probs) if prob >= custom_thresholds[label]]
 
-    # If both positive and negative detected, but mixed isn't, treat it as mixed
+    # Step 1: Infer 'mixed' from positive + negative if needed
     if "positive" in predicted_labels and "negative" in predicted_labels and "mixed" not in predicted_labels:
         predicted_labels = [label for label in predicted_labels if label not in ["positive", "negative"]]
         predicted_labels.append("mixed")
+
+    # Step 2: If 'mixed' is present, remove individual positive and negative for clarity
+    if "mixed" in predicted_labels:
+        predicted_labels = [label for label in predicted_labels if label not in ["positive", "negative"]]
 
     return predicted_labels if predicted_labels else ["neutral"]
 
