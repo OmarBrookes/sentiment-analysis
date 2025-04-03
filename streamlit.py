@@ -1,6 +1,7 @@
 import streamlit as st
 import torch
 import transformers
+import random
 from transformers import RobertaTokenizer, RobertaForSequenceClassification
 
 # -=-=-=- Setup: Load model, tokenizer and set device -=-=-=-
@@ -51,7 +52,7 @@ custom_thresholds = {
     'ironic': 0.16
 }
 
-# Sample reviews to rotate through
+# Sample reviews to randomly choose from
 SAMPLE_REVIEWS = [
     "I absolutely love this! Everything works perfectly.",
     "This is the worst product I’ve ever bought.",
@@ -76,8 +77,8 @@ st.write("Enter text or upload a file to get sentiment predictions.")
 # Session state tracking
 if "user_input" not in st.session_state:
     st.session_state.user_input = ""
-if "sample_index" not in st.session_state:
-    st.session_state.sample_index = 0
+review_count = 0
+analyse_clicked = False
 
 # Input field
 user_input = st.text_area("Enter text here:", value=st.session_state.user_input, key="input_text")
@@ -85,12 +86,13 @@ user_input = st.text_area("Enter text here:", value=st.session_state.user_input,
 # File upload
 uploaded_file = st.file_uploader("Or upload a .txt file", type=["txt"])
 
-# Button layout (clean default buttons with even spacing)
-st.markdown("###")  # small space
+# Buttons layout
+st.markdown("###")
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    analyse_clicked = st.button("🚀 Analyse Sentiment")
+    if st.button("🚀 Analyse Sentiment"):
+        analyse_clicked = True
 
 with col2:
     if st.button("🗑️ Clear"):
@@ -99,11 +101,10 @@ with col2:
 
 with col3:
     if st.button("🎲 Try Sample Review"):
-        st.session_state.user_input = SAMPLE_REVIEWS[st.session_state.sample_index]
-        st.session_state.sample_index = (st.session_state.sample_index + 1) % len(SAMPLE_REVIEWS)
-        st.rerun()
-
-review_count = 0
+        random_sample = random.choice(SAMPLE_REVIEWS)
+        st.session_state.user_input = random_sample
+        st.toast("✅ Sample inserted!")
+        analyse_clicked = True
 
 # Prediction function
 def analyse_sentiment(text):
@@ -131,28 +132,29 @@ def analyse_sentiment(text):
 # Analyse from text input
 if analyse_clicked:
     if user_input:
-        review_count += 1
-        st.session_state.user_input = user_input
-        user_input_single_line = " ".join(user_input.splitlines())
-        st.subheader(f"Review #{review_count}")
-        st.markdown(
-            f'<div style="padding:10px;margin-bottom:5px;font-weight:bold;">📝 Review Entered: "{user_input_single_line}"</div>',
-            unsafe_allow_html=True
-        )
+        with st.spinner("🔍 Analysing..."):
+            review_count += 1
+            st.session_state.user_input = user_input
+            user_input_single_line = " ".join(user_input.splitlines())
+            st.subheader(f"Review #{review_count}")
+            st.markdown(
+                f'<div style="padding:10px;margin-bottom:5px;font-weight:bold;">📝 Review Entered: "{user_input_single_line}"</div>',
+                unsafe_allow_html=True
+            )
 
-        sentiment = analyse_sentiment(user_input_single_line)
-        sentiment_with_emojis = ', '.join([f"{EMOJIS[label]} {label}" for label in sentiment])
-        sentiment_colour = COLOURS[sentiment[0]]
+            sentiment = analyse_sentiment(user_input_single_line)
+            sentiment_with_emojis = ', '.join([f"{EMOJIS[label]} {label}" for label in sentiment])
+            sentiment_colour = COLOURS[sentiment[0]]
 
-        st.markdown(
-            f'<div style="background-color:{sentiment_colour};padding:10px;border-radius:5px;color:black;font-weight:bold;margin-bottom:15px;">Sentiment: {sentiment_with_emojis}</div>',
-            unsafe_allow_html=True
-        )
+            st.markdown(
+                f'<div style="background-color:{sentiment_colour};padding:10px;border-radius:5px;color:black;font-weight:bold;margin-bottom:15px;">Sentiment: {sentiment_with_emojis}</div>',
+                unsafe_allow_html=True
+            )
 
-        for label in sentiment:
-            st.markdown(f"<div style='margin-bottom:10px;'>{REVIEW_MESSAGES[label]}</div>", unsafe_allow_html=True)
+            for label in sentiment:
+                st.markdown(f"<div style='margin-bottom:10px;'>{REVIEW_MESSAGES[label]}</div>", unsafe_allow_html=True)
 
-        st.markdown("---")
+            st.markdown("---")
 
 # Analyse from uploaded file
 if uploaded_file:
