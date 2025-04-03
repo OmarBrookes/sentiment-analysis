@@ -4,7 +4,7 @@ import transformers
 import random
 from transformers import RobertaTokenizer, RobertaForSequenceClassification
 
-# -=-=-=- Setup: Load model, tokenizer and set device -=-=-=- #
+# Load model & tokenizer
 MODEL_PATH = "OmarBrookes/sentiment-analysis"
 tokenizer = RobertaTokenizer.from_pretrained(MODEL_PATH)
 model = RobertaForSequenceClassification.from_pretrained(MODEL_PATH)
@@ -12,23 +12,15 @@ model = RobertaForSequenceClassification.from_pretrained(MODEL_PATH)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 
-# Labels, emojis and colours
+# Labels and UI settings
 LABELS = ['neutral', 'positive', 'mixed', 'sarcastic', 'negative', 'ironic']
 EMOJIS = {
-    'neutral': '😐',
-    'positive': '😊',
-    'mixed': '🤔',
-    'sarcastic': '🙃',
-    'negative': '😞',
-    'ironic': '😏'
+    'neutral': '😐', 'positive': '😊', 'mixed': '🤔',
+    'sarcastic': '🙃', 'negative': '😞', 'ironic': '😏'
 }
 COLOURS = {
-    'neutral': '#D3D3D3',
-    'positive': '#90EE90',
-    'mixed': '#FFD700',
-    'sarcastic': '#87CEEB',
-    'negative': '#FFB6C1',
-    'ironic': '#D8BFD8'
+    'neutral': '#D3D3D3', 'positive': '#90EE90', 'mixed': '#FFD700',
+    'sarcastic': '#87CEEB', 'negative': '#FFB6C1', 'ironic': '#D8BFD8'
 }
 REVIEW_MESSAGES = {
     "positive": "✔️ This review is positive and expresses satisfaction.",
@@ -38,18 +30,10 @@ REVIEW_MESSAGES = {
     "sarcastic": "🙃 This review sounds sarcastic — it might mean the opposite of what it says.",
     "ironic": "😏 This review has an ironic tone — likely saying one thing but implying another."
 }
-
-# Thresholds
 custom_thresholds = {
-    'neutral': 0.39,
-    'positive': 0.509,
-    'mixed': 0.22,
-    'sarcastic': 0.29,
-    'negative': 0.428,
-    'ironic': 0.16
+    'neutral': 0.39, 'positive': 0.509, 'mixed': 0.22,
+    'sarcastic': 0.29, 'negative': 0.428, 'ironic': 0.16
 }
-
-# Sample reviews
 SAMPLE_REVIEWS = [
     "I absolutely love this! Everything works perfectly.",
     "This is the worst product I’ve ever bought.",
@@ -67,23 +51,21 @@ SAMPLE_REVIEWS = [
     "Wow, just wow. Not in a good way though."
 ]
 
-# App UI
+# UI
 st.title("💬 Sentiment Analysis")
 st.write("Enter text or upload a file to get sentiment predictions.")
 
-# Initialize session state
+# Setup session state
 if "user_input" not in st.session_state:
     st.session_state.user_input = ""
-if "input_text" not in st.session_state:
-    st.session_state.input_text = ""
 
-# Text input
-user_input = st.text_area("Enter text here:", key="input_text")
+# Text input (NO key used here)
+user_input = st.text_area("Enter text here:", value=st.session_state.user_input)
 
-# File upload (don't use key in session_state!)
+# File upload (NO key!)
 uploaded_file = st.file_uploader("Or upload a .txt file", type=["txt"])
 
-# Button layout
+# Buttons
 st.markdown("###")
 col1, col2, col3 = st.columns(3)
 
@@ -91,26 +73,23 @@ analyse_clicked = False
 
 with col1:
     if st.button("🚀 Analyse Sentiment"):
+        st.session_state.user_input = user_input
         analyse_clicked = True
 
 with col2:
     if st.button("🗑️ Clear"):
-        # Properly reset session state (excluding file_uploader)
-        st.session_state.input_text = ""
         st.session_state.user_input = ""
         st.rerun()
 
 with col3:
     if st.button("🎲 Try Sample Review"):
-        st.session_state.input_text = random.choice(SAMPLE_REVIEWS)
-        analyse_clicked = True
+        st.session_state.user_input = random.choice(SAMPLE_REVIEWS)
         st.rerun()
 
-# Sentiment prediction
+# Sentiment function
 def analyse_sentiment(text):
     inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=128)
     inputs = {k: v.to(device) for k, v in inputs.items()}
-
     model.eval()
     with torch.no_grad():
         outputs = model(**inputs)
@@ -119,54 +98,49 @@ def analyse_sentiment(text):
     predicted_labels = [label for label, prob in zip(LABELS, probs) if prob >= custom_thresholds[label]]
 
     if "positive" in predicted_labels and "negative" in predicted_labels and "mixed" not in predicted_labels:
-        predicted_labels = [label for label in predicted_labels if label not in ["positive", "negative"]]
+        predicted_labels = [l for l in predicted_labels if l not in ["positive", "negative"]]
         predicted_labels.append("mixed")
 
     if "mixed" in predicted_labels:
-        predicted_labels = [label for label in predicted_labels if label not in ["positive", "negative"]]
+        predicted_labels = [l for l in predicted_labels if l not in ["positive", "negative"]]
 
     return predicted_labels if predicted_labels else ["neutral"]
 
-# Handle text input analysis
-if analyse_clicked and st.session_state.input_text:
+# Analyse text box input
+if analyse_clicked and st.session_state.user_input:
     with st.spinner("🔍 Analysing..."):
-        review_text = " ".join(st.session_state.input_text.splitlines())
+        text = st.session_state.user_input.strip()
         st.subheader("Review")
-        st.markdown(
-            f'<div style="padding:10px;margin-bottom:5px;font-weight:bold;">📝 Review Entered: "{review_text}"</div>',
-            unsafe_allow_html=True
-        )
+        st.markdown(f'<div style="padding:10px;font-weight:bold;">📝 Review Entered: "{text}"</div>', unsafe_allow_html=True)
 
-        sentiment = analyse_sentiment(review_text)
+        sentiment = analyse_sentiment(text)
         sentiment_with_emojis = ', '.join([f"{EMOJIS[label]} {label}" for label in sentiment])
-        sentiment_colour = COLOURS[sentiment[0]]
+        colour = COLOURS[sentiment[0]]
 
         st.markdown(
-            f'<div style="background-color:{sentiment_colour};padding:10px;border-radius:5px;color:black;font-weight:bold;margin-bottom:15px;">Sentiment: {sentiment_with_emojis}</div>',
+            f'<div style="background-color:{colour};padding:10px;border-radius:5px;color:black;font-weight:bold;margin-bottom:15px;">Sentiment: {sentiment_with_emojis}</div>',
             unsafe_allow_html=True
         )
-
         for label in sentiment:
             st.markdown(f"<div style='margin-bottom:10px;'>{REVIEW_MESSAGES[label]}</div>", unsafe_allow_html=True)
-
         st.markdown("---")
 
-# Handle file upload analysis
+# Analyse file
 if uploaded_file:
-    sentences = uploaded_file.read().decode("utf-8").splitlines()
-    st.subheader(f"Processing {len(sentences)} reviews from file...")
-    for idx, sentence in enumerate(sentences, start=1):
+    lines = uploaded_file.read().decode("utf-8").splitlines()
+    st.subheader(f"Processing {len(lines)} reviews from file...")
+    for idx, sentence in enumerate(lines, start=1):
         if sentence.strip():
             sentiment = analyse_sentiment(sentence)
             sentiment_with_emojis = ', '.join([f"{EMOJIS[label]} {label}" for label in sentiment])
-            sentiment_colour = COLOURS[sentiment[0]]
+            colour = COLOURS[sentiment[0]]
 
             st.markdown(
                 f'<div style="padding:10px;margin-bottom:5px;font-weight:bold;">📝 Review #{idx}: "{sentence}"</div>',
                 unsafe_allow_html=True
             )
             st.markdown(
-                f'<div style="background-color:{sentiment_colour};padding:10px;border-radius:5px;color:black;font-weight:bold;margin-bottom:10px;">Sentiment: {sentiment_with_emojis}</div>',
+                f'<div style="background-color:{colour};padding:10px;border-radius:5px;color:black;font-weight:bold;margin-bottom:10px;">Sentiment: {sentiment_with_emojis}</div>',
                 unsafe_allow_html=True
             )
             for label in sentiment:
