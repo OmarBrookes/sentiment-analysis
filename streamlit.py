@@ -1,3 +1,5 @@
+# Fix for Streamlit + PyTorch conflict:
+# Disables Streamlit's file watcher to prevent RuntimeError from torch.classes
 import os
 os.environ["STREAMLIT_DISABLE_FILE_WATCHER"] = "true"
 
