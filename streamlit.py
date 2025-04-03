@@ -25,12 +25,12 @@ EMOJIS = {
 }
 
 COLOURS = {
-    'neutral': '#D3D3D3',
-    'positive': '#90EE90',
-    'mixed': '#FFD700',
-    'sarcastic': '#87CEEB',
-    'negative': '#FFB6C1',
-    'ironic': '#D8BFD8'
+    'neutral': '#D3D3D3',   # Light grey
+    'positive': '#90EE90',   # Light green
+    'mixed': '#FFD700',      # Gold
+    'sarcastic': '#87CEEB',  # Sky blue
+    'negative': '#FFB6C1',   # Light pink
+    'ironic': '#D8BFD8'      # Purple (Thistle)
 }
 
 REVIEW_MESSAGES = {
