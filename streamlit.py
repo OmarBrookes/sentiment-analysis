@@ -73,27 +73,6 @@ SAMPLE_REVIEWS = [
 st.title("💬 Sentiment Analysis")
 st.write("Enter text or upload a file to get sentiment predictions.")
 
-# Optional: Custom styling for nicer buttons
-st.markdown("""
-    <style>
-    .stButton > button {
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 10px 20px;
-        margin: 5px 0px;
-        font-size: 16px;
-        font-weight: bold;
-        transition: background-color 0.3s ease;
-    }
-
-    .stButton > button:hover {
-        background-color: #45a049;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
 # Session state tracking
 if "user_input" not in st.session_state:
     st.session_state.user_input = ""
@@ -106,18 +85,19 @@ user_input = st.text_area("Enter text here:", value=st.session_state.user_input,
 # File upload
 uploaded_file = st.file_uploader("Or upload a .txt file", type=["txt"])
 
-# Button row
-button_col1, button_col2, button_col3 = st.columns([1, 1, 1])
+# Button layout (clean default buttons with even spacing)
+st.markdown("###")  # small space
+col1, col2, col3 = st.columns(3)
 
-with button_col1:
+with col1:
     analyse_clicked = st.button("🚀 Analyse Sentiment")
 
-with button_col2:
+with col2:
     if st.button("🗑️ Clear"):
         st.session_state.user_input = ""
         st.rerun()
 
-with button_col3:
+with col3:
     if st.button("🎲 Try Sample Review"):
         st.session_state.user_input = SAMPLE_REVIEWS[st.session_state.sample_index]
         st.session_state.sample_index = (st.session_state.sample_index + 1) % len(SAMPLE_REVIEWS)
