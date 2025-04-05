@@ -54,20 +54,26 @@ custom_thresholds = {
 
 # Sample reviews to randomly choose from
 SAMPLE_REVIEWS = [
-    "I absolutely love this! Everything works perfectly.",
-    "This is the worst product I’ve ever bought.",
-    "It’s fine. Not good, not bad. Just fine.",
-    "The product is great, but the customer service was awful.",
-    "Yeah, this is exactly what I needed... not.",
-    "Fantastic quality and super fast shipping!",
-    "Do not waste your money on this junk.",
-    "It does what it says, but I wouldn’t buy it again.",
-    "Oh great, another feature that doesn’t actually work.",
-    "Pretty average overall, nothing stood out.",
-    "If disappointment had a face, it would be this product.",
-    "Honestly, I expected worse. Pleasantly surprised.",
-    "Good build, but the software is a nightmare.",
-    "Wow, just wow. Not in a good way though."
+    "I absolutely love this! Everything works perfectly.",        # positive
+    "This is the worst product I’ve ever bought.",                # negative
+    "It’s fine. Not good, not bad. Just fine.",                   # neutral
+    "The product is great, but the customer service was awful.",  # mixed
+    "Yeah, this is exactly what I needed... not.",                # sarcastic
+    "Fantastic quality and super fast shipping!",                 # positive
+    "Do not waste your money on this junk.",                      # negative
+    "It does what it says, but I wouldn’t buy it again.",         # mixed
+    "Oh great, another feature that doesn’t actually work.",      # sarcastic
+    "Pretty average overall, nothing stood out.",                 # neutral
+    "If disappointment had a face, it would be this product.",    # negative
+    "Honestly, I expected worse. Pleasantly surprised.",          # positive
+    "Good build, but the software is a nightmare.",               # mixed
+    "Wow, just wow. Not in a good way though.",                   # ironic
+    "I’m happy with my purchase.",                                # positive
+    "It broke after two days. Useless.",                          # negative
+    "Nothing special, it’s just okay.",                           # neutral
+    "Nice design, awful performance.",                            # mixed
+    "Oh sure, because *that* feature really helped... not.",      # sarcastic
+    "This thing really nailed the 'barely works' vibe.",          # ironic
 ]
 
 # -=-=-=- Streamlit UI Setup -=-=-=-
