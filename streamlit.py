@@ -105,10 +105,20 @@ with col2:
         st.rerun()
 
 with col3:
+    if "last_sample" not in st.session_state:
+        st.session_state.last_sample = None
+
     if st.button("🎲 Try Sample Review"):
-        random_sample = random.choice(SAMPLE_REVIEWS)
-        st.session_state.user_input = random_sample
+        new_sample = random.choice(SAMPLE_REVIEWS)
+
+        # Avoid repeating the same review twice in a row
+        while new_sample == st.session_state.last_sample and len(SAMPLE_REVIEWS) > 1:
+            new_sample = random.choice(SAMPLE_REVIEWS)
+
+        st.session_state.user_input = new_sample
+        st.session_state.last_sample = new_sample
         analyse_clicked = True
+
 
 # Prediction function
 def analyse_sentiment(text):
@@ -162,7 +172,7 @@ if analyse_clicked:
 
 # Analyse from uploaded file
 if uploaded_file:
-    sentences = uploaded_file.read().decode("utf-8").splitlines()
+    sentences = [line.strip() for line in uploaded_file.read().decode("utf-8").splitlines() if line.strip()]
     st.subheader(f"Processing {len(sentences)} reviews from file...")
     for idx, sentence in enumerate(sentences, start=1):
         if sentence.strip():
