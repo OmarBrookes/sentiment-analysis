@@ -104,6 +104,7 @@ with col2:
     if st.button("🗑️ Clear"):
         for key in list(st.session_state.keys()):
             del st.session_state[key]
+        st.session_state.review_count = 0
         st.rerun()
 
 with col3:
@@ -113,7 +114,7 @@ with col3:
     if st.button("🎲 Try Sample Review"):
         # Clear state before new sample
         for key in list(st.session_state.keys()):
-            if key not in ["shuffled_samples"]:  # Keep the sample list!
+            if key not in ["shuffled_samples"]:
                 del st.session_state[key]
 
         # Pop a new sample from the shuffled list
@@ -145,13 +146,11 @@ def analyse_sentiment(text):
 
     return predicted_labels if predicted_labels else ["neutral"]
 
-# Analyse from text input
+# Analyse from text input (no numbering here)
 if st.session_state.analyse_clicked:
     if st.session_state.input_text:
         with st.spinner("🔍 Analysing..."):
-            st.session_state.review_count += 1
             user_input_single_line = " ".join(st.session_state.input_text.splitlines())
-            st.subheader(f"Review #{st.session_state.review_count}")
             st.markdown(
                 f'<div style="padding:10px;margin-bottom:5px;font-weight:bold;">📝 Review Entered: "{user_input_single_line}"</div>',
                 unsafe_allow_html=True
@@ -172,7 +171,7 @@ if st.session_state.analyse_clicked:
             st.markdown("---")
     st.session_state.analyse_clicked = False
 
-# Analyse from uploaded file
+# Analyse from uploaded file (with numbering)
 if uploaded_file:
     sentences = [line.strip() for line in uploaded_file.read().decode("utf-8").splitlines() if line.strip()]
     st.subheader(f"Processing {len(sentences)} reviews from file...")
