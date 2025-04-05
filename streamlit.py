@@ -54,24 +54,24 @@ custom_thresholds = {
 
 # Sample reviews to randomly choose from
 SAMPLE_REVIEWS = [
-    "I absolutely love this! Everything works perfectly.",        # positive
-    "This is the worst product I’ve ever bought.",                # negative
-    "It’s fine. Not good, not bad. Just fine.",                   # neutral
-    "The product is great, but the customer service was awful.",  # mixed
-    "Yeah, this is exactly what I needed... not.",                # sarcastic & negative
-    "Fantastic quality and super fast shipping!",                 # positive
-    "Do not waste your money on this junk.",                      # negative
-    "It does what it says, but I wouldn’t buy it again.",         # mixed
-    "Oh great, another feature that doesn’t actually work.",      # sarcastic
-    "Pretty average overall, nothing stood out.",                 # neutral
-    "If disappointment had a face, it would be this product.",    # sarcastic, negative & ironic
-    "Good build, but the software is a nightmare.",               # mixed
-    "I’m happy with my purchase.",                                # positive
-    "It broke after two days. Useless.",                          # negative
-    "Nothing special, it’s just okay.",                           # neutral
-    "Nice design, awful performance.",                            # mixed
-    "Oh sure, because *that* feature really helped... not.",      # sarcastic
-    "This thing really nailed the 'barely works' vibe.",          # sarcastic & ironic
+    "I absolutely love this! Everything works perfectly.",
+    "This is the worst product I’ve ever bought.",
+    "It’s fine. Not good, not bad. Just fine.",
+    "The product is great, but the customer service was awful.",
+    "Yeah, this is exactly what I needed... not.",
+    "Fantastic quality and super fast shipping!",
+    "Do not waste your money on this junk.",
+    "It does what it says, but I wouldn’t buy it again.",
+    "Oh great, another feature that doesn’t actually work.",
+    "Pretty average overall, nothing stood out.",
+    "If disappointment had a face, it would be this product.",
+    "Good build, but the software is a nightmare.",
+    "I’m happy with my purchase.",
+    "It broke after two days. Useless.",
+    "Nothing special, it’s just okay.",
+    "Nice design, awful performance.",
+    "Oh sure, because *that* feature really helped... not.",
+    "This thing really nailed the 'barely works' vibe.",
 ]
 
 # -=-=-=- Streamlit UI Setup -=-=-=-
@@ -103,7 +103,9 @@ with col1:
 with col2:
     if st.button("🗑️ Clear"):
         for key in list(st.session_state.keys()):
-            del st.session_state[key]
+            if key not in ["shuffled_samples"]:  # Keep sample shuffle
+                del st.session_state[key]
+        st.session_state.file_uploader = None  # Clear uploaded file
         st.session_state.review_count = 0
         st.rerun()
 
@@ -169,7 +171,11 @@ if st.session_state.analyse_clicked:
 
 # Analyse from uploaded file (WITH numbering)
 if uploaded_file:
+    for key in list(st.session_state.keys()):
+        if key not in ["shuffled_samples"]:
+            del st.session_state[key]
     st.session_state.review_count = 0  # Reset counter for new file
+
     sentences = [line.strip() for line in uploaded_file.read().decode("utf-8").splitlines() if line.strip()]
     st.subheader(f"Processing {len(sentences)} reviews from file...")
     for idx, sentence in enumerate(sentences, start=1):
