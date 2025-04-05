@@ -58,22 +58,20 @@ SAMPLE_REVIEWS = [
     "This is the worst product I’ve ever bought.",                # negative
     "It’s fine. Not good, not bad. Just fine.",                   # neutral
     "The product is great, but the customer service was awful.",  # mixed
-    "Yeah, this is exactly what I needed... not.",                # sarcastic
+    "Yeah, this is exactly what I needed... not.",                # sarcastic & negative
     "Fantastic quality and super fast shipping!",                 # positive
     "Do not waste your money on this junk.",                      # negative
     "It does what it says, but I wouldn’t buy it again.",         # mixed
     "Oh great, another feature that doesn’t actually work.",      # sarcastic
     "Pretty average overall, nothing stood out.",                 # neutral
-    "If disappointment had a face, it would be this product.",    # negative
-    "Honestly, I expected worse. Pleasantly surprised.",          # positive
+    "If disappointment had a face, it would be this product.",    # sarcastic, negative & ironic
     "Good build, but the software is a nightmare.",               # mixed
-    "Wow, just wow. Not in a good way though.",                   # ironic
     "I’m happy with my purchase.",                                # positive
     "It broke after two days. Useless.",                          # negative
     "Nothing special, it’s just okay.",                           # neutral
     "Nice design, awful performance.",                            # mixed
     "Oh sure, because *that* feature really helped... not.",      # sarcastic
-    "This thing really nailed the 'barely works' vibe.",          # ironic
+    "This thing really nailed the 'barely works' vibe.",          # sarcastic & ironic
 ]
 
 # -=-=-=- Streamlit UI Setup -=-=-=-
