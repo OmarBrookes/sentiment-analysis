@@ -75,15 +75,15 @@ st.title("💬 Sentiment Analysis")
 st.write("Enter text or upload a file to get sentiment predictions.")
 
 # Session state tracking
-if "user_input" not in st.session_state:
-    st.session_state.user_input = ""
+if "input_text" not in st.session_state:
+    st.session_state.input_text = ""
 if "analyse_clicked" not in st.session_state:
     st.session_state.analyse_clicked = False
 if "review_count" not in st.session_state:
     st.session_state.review_count = 0
 
 # Input field
-user_input = st.text_area("Enter text here:", value=st.session_state.user_input, key="input_text")
+user_input = st.text_area("Enter text here:", key="input_text")
 
 # File upload
 uploaded_file = st.file_uploader("Or upload a .txt file", type=["txt"], key="file_uploader")
@@ -103,13 +103,18 @@ with col2:
         st.rerun()
 
 with col3:
-    if st.button("🎲 Try Sample Review"):
-        for key in list(st.session_state.keys()):
-            del st.session_state[key]
+    if "shuffled_samples" not in st.session_state or not st.session_state.shuffled_samples:
+        st.session_state.shuffled_samples = random.sample(SAMPLE_REVIEWS, len(SAMPLE_REVIEWS))
 
-        random_sample = random.choice(SAMPLE_REVIEWS)
-        st.session_state.user_input = random_sample
-        st.session_state.input_text = random_sample
+    if st.button("🎲 Try Sample Review"):
+        # Clear state before new sample
+        for key in list(st.session_state.keys()):
+            if key not in ["shuffled_samples"]:  # Keep the sample list!
+                del st.session_state[key]
+
+        # Pop a new sample from the shuffled list
+        new_sample = st.session_state.shuffled_samples.pop()
+        st.session_state.input_text = new_sample
         st.session_state.analyse_clicked = True
         st.rerun()
 
@@ -138,10 +143,10 @@ def analyse_sentiment(text):
 
 # Analyse from text input
 if st.session_state.analyse_clicked:
-    if st.session_state.user_input:
+    if st.session_state.input_text:
         with st.spinner("🔍 Analysing..."):
             st.session_state.review_count += 1
-            user_input_single_line = " ".join(st.session_state.user_input.splitlines())
+            user_input_single_line = " ".join(st.session_state.input_text.splitlines())
             st.subheader(f"Review #{st.session_state.review_count}")
             st.markdown(
                 f'<div style="padding:10px;margin-bottom:5px;font-weight:bold;">📝 Review Entered: "{user_input_single_line}"</div>',
