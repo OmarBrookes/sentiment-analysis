@@ -106,19 +106,23 @@ with col2:
 
 with col3:
     if "last_sample" not in st.session_state:
-        st.session_state.last_sample = None
+        st.session_state.last_sample = ""
 
     if st.button("🎲 Try Sample Review"):
-        new_sample = random.choice(SAMPLE_REVIEWS)
+        # Make a copy of the samples and remove the last sample to avoid repetition
+        available_samples = [s for s in SAMPLE_REVIEWS if s != st.session_state.last_sample]
 
-        # Avoid repeating the same review twice in a row
-        while new_sample == st.session_state.last_sample and len(SAMPLE_REVIEWS) > 1:
-            new_sample = random.choice(SAMPLE_REVIEWS)
+        # If all samples have been used or only one remains, reset the list
+        if not available_samples:
+            available_samples = SAMPLE_REVIEWS.copy()
 
+        # Choose a new one
+        new_sample = random.choice(available_samples)
+
+        # Update session state
         st.session_state.user_input = new_sample
         st.session_state.last_sample = new_sample
         analyse_clicked = True
-
 
 # Prediction function
 def analyse_sentiment(text):
