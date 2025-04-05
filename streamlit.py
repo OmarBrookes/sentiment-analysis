@@ -15,7 +15,6 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 
 # -=-=-=- Configuration: Labels, Emojis, Colours, Messages -=-=-=-
-# Define the possible sentiment categories the model can detect
 LABELS = ['neutral', 'positive', 'mixed', 'sarcastic', 'negative', 'ironic']
 
 # Emoji used for visual display of each sentiment category
@@ -82,13 +81,33 @@ SAMPLE_REVIEWS = [
     "This thing really nailed the 'barely works' vibe."
 ]
 
-# -=-=-=- Streamlit UI Setup -=-=-=-
-# Page title and instructions
-st.title("💬 Sentiment Analysis")
-st.write("Enter text or upload a file to get sentiment predictions.")
+# -=-=-=- Apply Custom Styling to Tidy the UI Layout -=-=-=-
+st.markdown("""
+    <style>
+        .block-container {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+            padding-left: 3rem;
+            padding-right: 3rem;
+        }
+        textarea {
+            font-size: 16px !important;
+        }
+        .stButton button {
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
-# -=-=-=- Session State Tracking and Initalise -=-=-=-
-# Session state variables store values between Streamlit reruns
+# -=-=-=- Page Title and Section -=-=-=-
+st.markdown("""
+    <h2 style='text-align: center;'>💬 Sentiment Analysis</h2>
+    <p style='text-align: center;'>Analyse the sentiment of text or reviews. Paste your text, upload a file, or try a sample.</p>
+    <hr style='margin-top: 10px; margin-bottom: 25px;'>
+""", unsafe_allow_html=True)
+
+# -=-=-=- Session State Init (Keeps track of UI state) -=-=-=-
 if "input_text" not in st.session_state:
     st.session_state.input_text = ""
 if "analyse_clicked" not in st.session_state:
@@ -98,34 +117,31 @@ if "review_count" not in st.session_state:
 if "file_key" not in st.session_state:
     st.session_state.file_key = 0
 
-# -=-=-=- User Inputs (Text and File Upload) -=-=-=-
-# Manual text input area
-user_input = st.text_area("Enter text here:", key="input_text")
+# -=-=-=- Input Area (Text and File Upload) -=-=-=-
+st.markdown("#### 1. Input your review")
+user_input = st.text_area("Type or paste your text here:", key="input_text")
 
-# File upload input, key is dynamic so it can be reset by changing file_key
-uploaded_file = st.file_uploader("Or upload a .txt file", type=["txt"], key=f"file_uploader_{st.session_state.file_key}")
+uploaded_file = st.file_uploader("Or upload a .txt file with one review per line:", type=["txt"], key=f"file_uploader_{st.session_state.file_key}")
 
-# -=-=-=- Buttons (Analyse / Clear / Sample Review) -=-=-=-
-st.markdown("###")
-col1, col2, col3 = st.columns(3)
+# -=-=-=- Button Controls (Clean Layout & Centered) -=-=-=-
+st.markdown("<div style='margin-top: 20px; text-align: center;'>", unsafe_allow_html=True)
 
-# Trigger sentiment analysis manually
-with col1:
+col_a, col_b, col_c = st.columns([1, 1, 1])
+
+with col_a:
     if st.button("🚀 Analyse Sentiment"):
         st.session_state.analyse_clicked = True
 
-# Clear/reset all input fields, predictions, and counters
-with col2:
+with col_b:
     if st.button("🗑️ Clear"):
         for key in list(st.session_state.keys()):
             if key not in ["shuffled_samples", "file_key"]:
                 del st.session_state[key]
-        st.session_state.file_key += 1  # Triggers a new key for the file uploader
+        st.session_state.file_key += 1
         st.session_state.review_count = 0
         st.rerun()
 
-# Load a random sample review from the list, shuffled with no repeats
-with col3:
+with col_c:
     if "shuffled_samples" not in st.session_state or not st.session_state.shuffled_samples:
         st.session_state.shuffled_samples = random.sample(SAMPLE_REVIEWS, len(SAMPLE_REVIEWS))
 
@@ -138,9 +154,9 @@ with col3:
         st.session_state.analyse_clicked = True
         st.rerun()
 
-# -=-=-=- Sentiment Analysis Function -=-=-=-
-# Runs inference on the input text using the model and applies thresholds
+st.markdown("</div>", unsafe_allow_html=True)
 
+# -=-=-=- Sentiment Prediction Function -=-=-=-
 def analyse_sentiment(text):
     inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=128)
     inputs = {k: v.to(device) for k, v in inputs.items()}
@@ -152,53 +168,43 @@ def analyse_sentiment(text):
 
     predicted_labels = [label for label, prob in zip(LABELS, probs) if prob >= custom_thresholds[label]]
 
-    # Convert to 'mixed' if both 'positive' and 'negative' are present
     if "positive" in predicted_labels and "negative" in predicted_labels and "mixed" not in predicted_labels:
         predicted_labels = [label for label in predicted_labels if label not in ["positive", "negative"]]
         predicted_labels.append("mixed")
 
-    # Remove positive/negative if 'mixed' already exists
     if "mixed" in predicted_labels:
         predicted_labels = [label for label in predicted_labels if label not in ["positive", "negative"]]
 
     return predicted_labels if predicted_labels else ["neutral"]
 
-# -=-=-=- Analyse Text Input (Single Review) -=-=-=-
-# This section handles sentiment analysis for user-entered or sample review
+# -=-=-=- Prediction Output for Text Area Input -=-=-=-
 if st.session_state.analyse_clicked:
     if st.session_state.input_text:
-        with st.spinner("🔍 Analysing..."):
+        with st.spinner("Analysing sentiment..."):
             user_input_single_line = " ".join(st.session_state.input_text.splitlines())
 
-            # Show original input text
-            st.markdown(
-                f'<div style="padding:10px;margin-bottom:5px;font-weight:bold;">📝 Review Entered: "{user_input_single_line}"</div>',
-                unsafe_allow_html=True
-            )
+            st.markdown(f'<div style="padding:10px 0;font-weight:bold;">📝 Review Entered:</div><div style="margin-bottom:5px">"{user_input_single_line}"</div>', unsafe_allow_html=True)
 
-            # Analyse and display predictions
             sentiment = analyse_sentiment(user_input_single_line)
             sentiment_with_emojis = ', '.join([f"{EMOJIS[label]} {label}" for label in sentiment])
             sentiment_colour = COLOURS[sentiment[0]]
 
             st.markdown(
-                f'<div style="background-color:{sentiment_colour};padding:10px;border-radius:5px;color:black;font-weight:bold;margin-bottom:15px;">Sentiment: {sentiment_with_emojis}</div>',
+                f'<div style="background-color:{sentiment_colour};padding:10px;border-radius:8px;color:black;font-weight:bold;margin-bottom:15px;">Sentiment: {sentiment_with_emojis}</div>',
                 unsafe_allow_html=True
             )
 
-            # Show explanation for each predicted sentiment
             for label in sentiment:
                 st.markdown(f"<div style='margin-bottom:10px;'>{REVIEW_MESSAGES[label]}</div>", unsafe_allow_html=True)
 
-            st.markdown("---")
+            st.markdown("<hr style='margin-top:30px;'>", unsafe_allow_html=True)
     st.session_state.analyse_clicked = False
 
-# -=-=-=- Analyse Uploaded File (Multi-Review) -=-=-=-
-# Process every review in the uploaded .txt file, line-by-line
+# -=-=-=- Uploaded File Processing and Display -=-=-=-
 if uploaded_file:
     st.session_state.review_count = 0
     sentences = [line.strip() for line in uploaded_file.read().decode("utf-8").splitlines() if line.strip()]
-    st.subheader(f"Processing {len(sentences)} reviews from file...")
+    st.subheader(f"📂 Processing {len(sentences)} reviews from uploaded file")
 
     for idx, sentence in enumerate(sentences, start=1):
         st.session_state.review_count += 1
@@ -206,17 +212,14 @@ if uploaded_file:
         sentiment_with_emojis = ', '.join([f"{EMOJIS[label]} {label}" for label in sentiment])
         sentiment_colour = COLOURS[sentiment[0]]
 
-        # Display original review with its index
         st.markdown(
-            f'<div style="padding:10px;margin-bottom:5px;font-weight:bold;">📝 Review #{st.session_state.review_count}: "{sentence}"</div>',
+            f'<div style="padding:10px 0;font-weight:bold;">📝 Review #{st.session_state.review_count}:</div><div style="margin-bottom:5px">"{sentence}"</div>',
             unsafe_allow_html=True
         )
-        # Show predicted sentiment block with coloured background
         st.markdown(
-            f'<div style="background-color:{sentiment_colour};padding:10px;border-radius:5px;color:black;font-weight:bold;margin-bottom:10px;">Sentiment: {sentiment_with_emojis}</div>',
+            f'<div style="background-color:{sentiment_colour};padding:10px;border-radius:8px;color:black;font-weight:bold;margin-bottom:10px;">Sentiment: {sentiment_with_emojis}</div>',
             unsafe_allow_html=True
         )
-        # Explanation for each detected sentiment
         for label in sentiment:
             st.markdown(f"<div style='margin-bottom:10px;'>{REVIEW_MESSAGES[label]}</div>", unsafe_allow_html=True)
-        st.markdown("---")
+        st.markdown("<hr style='margin-top:20px;'>", unsafe_allow_html=True)
