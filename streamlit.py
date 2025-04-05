@@ -25,12 +25,12 @@ EMOJIS = {
 }
 
 COLOURS = {
-    'neutral': '#D3D3D3',   # Light grey
-    'positive': '#90EE90',   # Light green
-    'mixed': '#FFD700',      # Gold
-    'sarcastic': '#87CEEB',  # Sky blue
-    'negative': '#FFB6C1',   # Light pink
-    'ironic': '#D8BFD8'      # Purple (Thistle)
+    'neutral': '#D3D3D3',
+    'positive': '#90EE90',
+    'mixed': '#FFD700',
+    'sarcastic': '#87CEEB',
+    'negative': '#FFB6C1',
+    'ironic': '#D8BFD8'
 }
 
 REVIEW_MESSAGES = {
@@ -77,9 +77,10 @@ st.write("Enter text or upload a file to get sentiment predictions.")
 # Session state tracking
 if "user_input" not in st.session_state:
     st.session_state.user_input = ""
-
-review_count = 0
-analyse_clicked = False
+if "analyse_clicked" not in st.session_state:
+    st.session_state.analyse_clicked = False
+if "review_count" not in st.session_state:
+    st.session_state.review_count = 0
 
 # Input field
 user_input = st.text_area("Enter text here:", value=st.session_state.user_input, key="input_text")
@@ -93,43 +94,24 @@ col1, col2, col3 = st.columns(3)
 
 with col1:
     if st.button("🚀 Analyse Sentiment"):
-        analyse_clicked = True
+        st.session_state.analyse_clicked = True
 
 with col2:
     if st.button("🗑️ Clear"):
-        st.session_state.user_input = ""
-        if "input_text" in st.session_state:
-            del st.session_state["input_text"]
-        if "file_uploader" in st.session_state:
-            del st.session_state["file_uploader"]
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
         st.rerun()
 
 with col3:
-    if "last_sample" not in st.session_state:
-        st.session_state.last_sample = ""
-
-    if "sample_trigger" not in st.session_state:
-        st.session_state.sample_trigger = 0
-
     if st.button("🎲 Try Sample Review"):
-        st.session_state.sample_trigger += 1  # Trigger a new sample
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
 
-# Handle new sample review when triggered
-if st.session_state.sample_trigger:
-    available_samples = [s for s in SAMPLE_REVIEWS if s != st.session_state.last_sample]
-    if not available_samples:
-        available_samples = SAMPLE_REVIEWS.copy()
-
-    new_sample = random.choice(available_samples)
-
-    st.session_state.user_input = new_sample
-    st.session_state.last_sample = new_sample
-    analyse_clicked = True
-
-if st.button("🔄 Reset App"):
-    for key in st.session_state.keys():
-        del st.session_state[key]
-    st.rerun()
+        random_sample = random.choice(SAMPLE_REVIEWS)
+        st.session_state.user_input = random_sample
+        st.session_state.input_text = random_sample
+        st.session_state.analyse_clicked = True
+        st.rerun()
 
 # Prediction function
 def analyse_sentiment(text):
@@ -155,13 +137,12 @@ def analyse_sentiment(text):
     return predicted_labels if predicted_labels else ["neutral"]
 
 # Analyse from text input
-if analyse_clicked:
-    if user_input:
+if st.session_state.analyse_clicked:
+    if st.session_state.user_input:
         with st.spinner("🔍 Analysing..."):
-            review_count += 1
-            st.session_state.user_input = user_input
-            user_input_single_line = " ".join(user_input.splitlines())
-            st.subheader(f"Review #{review_count}")
+            st.session_state.review_count += 1
+            user_input_single_line = " ".join(st.session_state.user_input.splitlines())
+            st.subheader(f"Review #{st.session_state.review_count}")
             st.markdown(
                 f'<div style="padding:10px;margin-bottom:5px;font-weight:bold;">📝 Review Entered: "{user_input_single_line}"</div>',
                 unsafe_allow_html=True
@@ -180,26 +161,26 @@ if analyse_clicked:
                 st.markdown(f"<div style='margin-bottom:10px;'>{REVIEW_MESSAGES[label]}</div>", unsafe_allow_html=True)
 
             st.markdown("---")
+    st.session_state.analyse_clicked = False
 
 # Analyse from uploaded file
 if uploaded_file:
     sentences = [line.strip() for line in uploaded_file.read().decode("utf-8").splitlines() if line.strip()]
     st.subheader(f"Processing {len(sentences)} reviews from file...")
     for idx, sentence in enumerate(sentences, start=1):
-        if sentence.strip():
-            review_count += 1
-            sentiment = analyse_sentiment(sentence)
-            sentiment_with_emojis = ', '.join([f"{EMOJIS[label]} {label}" for label in sentiment])
-            sentiment_colour = COLOURS[sentiment[0]]
+        st.session_state.review_count += 1
+        sentiment = analyse_sentiment(sentence)
+        sentiment_with_emojis = ', '.join([f"{EMOJIS[label]} {label}" for label in sentiment])
+        sentiment_colour = COLOURS[sentiment[0]]
 
-            st.markdown(
-                f'<div style="padding:10px;margin-bottom:5px;font-weight:bold;">📝 Review #{review_count}: "{sentence}"</div>',
-                unsafe_allow_html=True
-            )
-            st.markdown(
-                f'<div style="background-color:{sentiment_colour};padding:10px;border-radius:5px;color:black;font-weight:bold;margin-bottom:10px;">Sentiment: {sentiment_with_emojis}</div>',
-                unsafe_allow_html=True
-            )
-            for label in sentiment:
-                st.markdown(f"<div style='margin-bottom:10px;'>{REVIEW_MESSAGES[label]}</div>", unsafe_allow_html=True)
-            st.markdown("---")
+        st.markdown(
+            f'<div style="padding:10px;margin-bottom:5px;font-weight:bold;">📝 Review #{st.session_state.review_count}: "{sentence}"</div>',
+            unsafe_allow_html=True
+        )
+        st.markdown(
+            f'<div style="background-color:{sentiment_colour};padding:10px;border-radius:5px;color:black;font-weight:bold;margin-bottom:10px;">Sentiment: {sentiment_with_emojis}</div>',
+            unsafe_allow_html=True
+        )
+        for label in sentiment:
+            st.markdown(f"<div style='margin-bottom:10px;'>{REVIEW_MESSAGES[label]}</div>", unsafe_allow_html=True)
+        st.markdown("---")
