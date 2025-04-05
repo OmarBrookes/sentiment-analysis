@@ -103,7 +103,7 @@ st.markdown("""
 # -=-=-=- Page Title and Section -=-=-=-
 st.markdown("""
     <h2 style='text-align: center;'>💬 Sentiment Analysis</h2>
-    <p style='text-align: center;'>Analyse the sentiment of text or reviews. Paste your text, upload a file, or try a sample.</p>
+    <p style='text-align: center;'>Analyse the sentiment of reviews. Paste your review, upload a file, or try a sample.</p>
     <hr style='margin-top: 10px; margin-bottom: 25px;'>
 """, unsafe_allow_html=True)
 
@@ -118,8 +118,8 @@ if "file_key" not in st.session_state:
     st.session_state.file_key = 0
 
 # -=-=-=- Input Area (Text and File Upload) -=-=-=-
-st.markdown("#### 1. Input your review")
-user_input = st.text_area("Type or paste your text here:", key="input_text")
+st.markdown("#### Write or Upload a Review")
+user_input = st.text_area("Type or paste your review here:", key="input_text")
 
 uploaded_file = st.file_uploader("Or upload a .txt file with one review per line:", type=["txt"], key=f"file_uploader_{st.session_state.file_key}")
 
