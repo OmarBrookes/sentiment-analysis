@@ -103,9 +103,13 @@ with col1:
 with col2:
     if st.button("🗑️ Clear"):
         for key in list(st.session_state.keys()):
-            if key not in ["shuffled_samples"]:  # Keep sample shuffle
+            if key not in ["shuffled_samples"]:  # Keep shuffled list if needed
                 del st.session_state[key]
-        st.session_state.file_uploader = None  # Clear uploaded file
+
+        # Safely remove file upload
+        if "file_uploader" in st.session_state:
+            del st.session_state["file_uploader"]
+
         st.session_state.review_count = 0
         st.rerun()
 
