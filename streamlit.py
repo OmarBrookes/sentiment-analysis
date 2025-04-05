@@ -85,12 +85,14 @@ if "analyse_clicked" not in st.session_state:
     st.session_state.analyse_clicked = False
 if "review_count" not in st.session_state:
     st.session_state.review_count = 0
+if "file_key" not in st.session_state:
+    st.session_state.file_key = 0
 
 # Input field
 user_input = st.text_area("Enter text here:", key="input_text")
 
-# File upload
-uploaded_file = st.file_uploader("Or upload a .txt file", type=["txt"], key="file_uploader")
+# File upload (with dynamic key to force reset)
+uploaded_file = st.file_uploader("Or upload a .txt file", type=["txt"], key=f"file_uploader_{st.session_state.file_key}")
 
 # Buttons layout
 st.markdown("###")
@@ -103,13 +105,10 @@ with col1:
 with col2:
     if st.button("🗑️ Clear"):
         for key in list(st.session_state.keys()):
-            if key not in ["shuffled_samples"]:  # Keep shuffled list if needed
+            if key not in ["shuffled_samples", "file_key"]:
                 del st.session_state[key]
 
-        # Safely remove file upload
-        if "file_uploader" in st.session_state:
-            del st.session_state["file_uploader"]
-
+        st.session_state.file_key += 1  # Force reset file uploader
         st.session_state.review_count = 0
         st.rerun()
 
@@ -119,7 +118,7 @@ with col3:
 
     if st.button("🎲 Try Sample Review"):
         for key in list(st.session_state.keys()):
-            if key not in ["shuffled_samples"]:
+            if key not in ["shuffled_samples", "file_key"]:
                 del st.session_state[key]
 
         new_sample = st.session_state.shuffled_samples.pop()
@@ -148,7 +147,7 @@ def analyse_sentiment(text):
 
     return predicted_labels if predicted_labels else ["neutral"]
 
-# Analyse from text input (NO numbering here)
+# Analyse from text input (NO numbering)
 if st.session_state.analyse_clicked:
     if st.session_state.input_text:
         with st.spinner("🔍 Analysing..."):
@@ -175,9 +174,6 @@ if st.session_state.analyse_clicked:
 
 # Analyse from uploaded file (WITH numbering)
 if uploaded_file:
-    for key in list(st.session_state.keys()):
-        if key not in ["shuffled_samples"]:
-            del st.session_state[key]
     st.session_state.review_count = 0  # Reset counter for new file
 
     sentences = [line.strip() for line in uploaded_file.read().decode("utf-8").splitlines() if line.strip()]
