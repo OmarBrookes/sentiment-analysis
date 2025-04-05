@@ -169,6 +169,7 @@ if st.session_state.analyse_clicked:
 
 # Analyse from uploaded file (WITH numbering)
 if uploaded_file:
+    st.session_state.review_count = 0  # Reset counter for new file
     sentences = [line.strip() for line in uploaded_file.read().decode("utf-8").splitlines() if line.strip()]
     st.subheader(f"Processing {len(sentences)} reviews from file...")
     for idx, sentence in enumerate(sentences, start=1):
