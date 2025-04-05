@@ -108,21 +108,28 @@ with col3:
     if "last_sample" not in st.session_state:
         st.session_state.last_sample = ""
 
+    if "sample_trigger" not in st.session_state:
+        st.session_state.sample_trigger = 0
+
     if st.button("🎲 Try Sample Review"):
-        # Make a copy of the samples and remove the last sample to avoid repetition
-        available_samples = [s for s in SAMPLE_REVIEWS if s != st.session_state.last_sample]
+        st.session_state.sample_trigger += 1  # Trigger a new sample
 
-        # If all samples have been used or only one remains, reset the list
-        if not available_samples:
-            available_samples = SAMPLE_REVIEWS.copy()
+# Handle new sample review when triggered
+if st.session_state.sample_trigger:
+    available_samples = [s for s in SAMPLE_REVIEWS if s != st.session_state.last_sample]
+    if not available_samples:
+        available_samples = SAMPLE_REVIEWS.copy()
 
-        # Choose a new one
-        new_sample = random.choice(available_samples)
+    new_sample = random.choice(available_samples)
 
-        # Update session state
-        st.session_state.user_input = new_sample
-        st.session_state.last_sample = new_sample
-        analyse_clicked = True
+    st.session_state.user_input = new_sample
+    st.session_state.last_sample = new_sample
+    analyse_clicked = True
+
+if st.button("🔄 Reset App"):
+    for key in st.session_state.keys():
+        del st.session_state[key]
+    st.rerun()
 
 # Prediction function
 def analyse_sentiment(text):
