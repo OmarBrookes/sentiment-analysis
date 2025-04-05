@@ -112,12 +112,10 @@ with col3:
         st.session_state.shuffled_samples = random.sample(SAMPLE_REVIEWS, len(SAMPLE_REVIEWS))
 
     if st.button("🎲 Try Sample Review"):
-        # Clear state before new sample
         for key in list(st.session_state.keys()):
             if key not in ["shuffled_samples"]:
                 del st.session_state[key]
 
-        # Pop a new sample from the shuffled list
         new_sample = st.session_state.shuffled_samples.pop()
         st.session_state.input_text = new_sample
         st.session_state.analyse_clicked = True
@@ -135,18 +133,16 @@ def analyse_sentiment(text):
 
     predicted_labels = [label for label, prob in zip(LABELS, probs) if prob >= custom_thresholds[label]]
 
-    # Convert positive + negative to mixed if needed
     if "positive" in predicted_labels and "negative" in predicted_labels and "mixed" not in predicted_labels:
         predicted_labels = [label for label in predicted_labels if label not in ["positive", "negative"]]
         predicted_labels.append("mixed")
 
-    # If mixed is present, remove positive and negative
     if "mixed" in predicted_labels:
         predicted_labels = [label for label in predicted_labels if label not in ["positive", "negative"]]
 
     return predicted_labels if predicted_labels else ["neutral"]
 
-# Analyse from text input (no numbering here)
+# Analyse from text input (NO numbering here)
 if st.session_state.analyse_clicked:
     if st.session_state.input_text:
         with st.spinner("🔍 Analysing..."):
@@ -171,7 +167,7 @@ if st.session_state.analyse_clicked:
             st.markdown("---")
     st.session_state.analyse_clicked = False
 
-# Analyse from uploaded file (with numbering)
+# Analyse from uploaded file (WITH numbering)
 if uploaded_file:
     sentences = [line.strip() for line in uploaded_file.read().decode("utf-8").splitlines() if line.strip()]
     st.subheader(f"Processing {len(sentences)} reviews from file...")
